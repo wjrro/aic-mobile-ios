@@ -14,6 +14,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var deepLinkString: String? = nil
 
+    var sectionsVC = SectionsViewController()
+    var objectVC:ObjectViewController = ObjectViewController()
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         AICAnalytics.configure()
@@ -134,24 +137,58 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if Common.DeepLinks.loadedEnoughToLink {
             
-        // Check if it is a tour
-        
-        if query.range(of: "tour") != nil
-        {
-            let data = urlString.components(separatedBy: "/")
-            if (data.count) >= 3
+            // Check if it is a tour
+            
+            if query.range(of: "tour") != nil
             {
-                guard let tourNID = Int(data[3]) else {
-                    return true
-                }
-                
-                guard let tour = AppDataManager.sharedInstance.getTour(forID: tourNID) else {
-                    return true
-                }
-                
+                let data = urlString.components(separatedBy: "/")
+                if (data.count) >= 3
+                {
+                    guard let tourNID = Int(data[3]) else {
+                        
+                        return true
+                    }
+                    
+                    guard let tour = AppDataManager.sharedInstance.getTour(forID: tourNID) else {
+                        
+                        return true
+                    }
+                    
                     let rootVC = window?.rootViewController as! RootViewController
                     rootVC.startTour(tour: tour)
                 }
+            } else if (query.range(of: "info") != nil) {
+                
+                let rootVC = window?.rootViewController as! RootViewController
+                rootVC.sectionsVC.setSelectedSection(sectionVC: sectionsVC.infoVC)
+                
+            } else if (query.range(of: "member") != nil) {
+                // switch to info view
+                let rootVC = window?.rootViewController as! RootViewController
+                rootVC.sectionsVC.setSelectedSection(sectionVC: sectionsVC.infoVC)
+                // add member card subview
+                sectionsVC.infoVC.view.addSubview(sectionsVC.infoVC.infoView.memberCardView)
+                
+            } else if (query.range(of: "object") != nil) {
+                
+                // not currently working properly
+                //                let data = urlString.components(separatedBy: "/")
+                //                if (data.count) >= 3
+                //                {
+                //                    guard let id = Int(data[3]) else {
+                //
+                //                        return true
+                //                    }
+                //                    guard let object = AppDataManager.sharedInstance.getObject(forAudioGuideID: id) else {
+                //
+                //                        return true
+                //                    }
+                //
+                //                    sectionsVC.showObject(object: object, audioGuideID: id)
+                //                    objectVC.delegate = self
+                //                     as? ObjectViewControllerDelegate
+                //                    objectVC.showMiniPlayer()
+                //                }
             }
         } else {
             
